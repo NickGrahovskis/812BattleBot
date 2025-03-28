@@ -41,7 +41,7 @@ volatile unsigned long rightPulses = 0;
 #define ENCODETIME 10
 
 #define TURN_180 15
-#define TURN_90_LEFT 12//7
+#define TURN_90_LEFT 12// 12
 #define TURN_90_RIGHT 9
 
 Adafruit_NeoPixel strip(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -54,7 +54,7 @@ long integral = 0;
 volatile int pulseCountLeft = 0;
 volatile int pulseCountRight = 0;
 
-float Kp = 20;    //15
+float Kp = 15;    //15
 float Ki = 0;  
 float Kd = 0;  
 
@@ -73,9 +73,9 @@ long duration;
 float distance;
 
 #define SAFE_DISTANCE 15
-#define STOP_DISTANCE 10
+#define STOP_DISTANCE 10 // 10
 
-const int SIDE_WALL[] = {6,11};
+const int SIDE_WALL[] = {6.5,11}; // 5 11
 
 const int Num_Led = 4;
 
@@ -177,7 +177,7 @@ void loop() {
       adjustSteering();
     } else /*if (FRONT_DIS < STOP_DISTANCE)*/ {
       updateSensorLeft();
-      if (LEFT_DIS < 10) {
+      if (LEFT_DIS < SIDE_WALL[0]) {
         DeadEndFunction();
         // Rotate_L(TURN_180);
       } else {
@@ -428,18 +428,39 @@ void Forward_BEFORE_RIGHT() {
   }
 }
 
+void moveBackward()
+{
+  analogWrite(MOTOR_A1, MOTOR_A_SPEED);
+  analogWrite(MOTOR_A2, 0);
+  analogWrite(MOTOR_B1, 0);
+  analogWrite(MOTOR_B2, MOTOR_B_SPEED);
+}
+
 void moveBackwardForShortTime(){
-  unsigned long startingTime = millis()
-  while (millis() - startingTime < 2000) {
+  unsigned long startingTime = millis();
+  while (millis() - startingTime < 1000) {
     moveBackward();
   }
 }
 
 void DeadEndFunction() {
   unsigned long startingTime = millis();
-  while (millis() - startingTime < 2000) {
-  
+  while (millis() - startingTime < 1000) {
+
   }
-  moveBackward();
+  moveBackwardForShortTime();
   Rotate_L(TURN_180);
 }
+
+void stuckFunction(){
+   unsigned long startingTime = millis();
+   if(LRotation < 5 || RRotation < 5){
+    if(millis() - startingTime >= 5000)
+    {
+     moveBackwardForShortTime();
+      startingTime = 0;
+    }
+   }
+}
+
+//not completely working 
