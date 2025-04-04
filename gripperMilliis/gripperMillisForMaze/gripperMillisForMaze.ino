@@ -102,7 +102,7 @@ void setup() {
 void loop() {
     // updateSensorFront();
     canStart();
-    if (start) {
+    if (start ) {
     grabCone();
     }
   

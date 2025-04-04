@@ -164,30 +164,75 @@ void setup() {
   delay(100);
 }
 
-void loop() {
-  updateSensorRight();
-  updateSensorFront();
+// void loop() {
+//   updateSensorRight();
+//   updateSensorFront();
 
-  // Update sensor values at the beginning of the loop
+//   // Update sensor values at the beginning of the loop
  
-  // Decision logic based on sensor readings
-  //if (RIGHT_DIS > SIDE_WALL[0]) {
-    if (FRONT_DIS > STOP_DISTANCE) {
-      // Adjust steering while moving forward
-      adjustSteering();
-    } else /*if (FRONT_DIS < STOP_DISTANCE)*/ {
-      updateSensorLeft();
-      if (LEFT_DIS < SIDE_WALL[0]) {
-        DeadEndFunction();
-        // Rotate_L(TURN_180);
-      } else {
-        Rotate_L(TURN_90_LEFT);
-      }
+//   // Decision logic based on sensor readings
+//   //if (RIGHT_DIS > SIDE_WALL[0]) {
+//     if (FRONT_DIS > STOP_DISTANCE) {
+//       // Adjust steering while moving forward
+//       adjustSteering();
+//     } else /*if (FRONT_DIS < STOP_DISTANCE)*/ {
+//       updateSensorLeft();
+//       if (LEFT_DIS < SIDE_WALL[0]) {
+//         DeadEndFunction();
+//         // Rotate_L(TURN_180);
+//       } else {
+//         Rotate_L(TURN_90_LEFT);
+//       }
+//     }
+//   // } else {
+//   //   Forward_BEFORE_RIGHT();
+//   //   Rotate_R(TURN_90_RIGHT);
+//   // }
+// }
+
+enum RobotState {
+  MOVE_FORWARD,
+  DEAD_END,
+  OBSTACLE_DETECTED
+};
+
+void loop() {
+  RobotState currentState;
+
+  // Determine state based on sensor readings
+  if (FRONT_DIS > STOP_DISTANCE) {
+    currentState = MOVE_FORWARD;
+  } else {
+    updateSensorLeft();
+    if (LEFT_DIS < 10) {
+      currentState = DEAD_END;
+    } else {
+      currentState = OBSTACLE_DETECTED;
     }
-  // } else {
-  //   Forward_BEFORE_RIGHT();
-  //   Rotate_R(TURN_90_RIGHT);
-  // }
+  }
+
+  // Execute actions based on state
+  switch (currentState) {
+    case MOVE_FORWARD:
+      normal_Pixel();
+      adjustSteering();
+      break;
+      
+    case DEAD_END:
+      // For a dead-end, move backward briefly and then perform a 90° left rotation
+      
+      Rotate_L(TURN_180_LEFT);
+      break;
+      
+    case OBSTACLE_DETECTED:
+      // When an obstacle is detected (but not a dead-end), perform a 90° left rotation
+      Rotate_L(TURN_90_LEFT);
+      break;
+      
+    default:
+      // Optionally handle an unexpected state
+      break;
+  }
 }
 
 void countPulseLeft() {
