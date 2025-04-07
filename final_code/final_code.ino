@@ -56,6 +56,7 @@ volatile unsigned long rightPulses = 0;
 
 
 // GRIPPER SETTINGS
+const int GRIPPER = 13;
 int OPEN_GRIPPER = 1500;
 int CLOSE_GRIPPER = 1000;
 
@@ -66,6 +67,8 @@ int CLOSE_GRIPPER = 1000;
 
 volatile unsigned long RRotation = 0;
 volatile unsigned long LRotation = 0;
+volatile unsigned long pulseCountLeft =0;
+volatile unsigned long pulseCountRight =0;
 
 // PID VARIABLES FOR MOVEMENT
 long previousError = 0;
